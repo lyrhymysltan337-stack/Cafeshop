@@ -703,7 +703,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
   .product-img.placeholder{display:flex;align-items:center;justify-content:center;color:#c9bfa8;font-size:11px;}
   .product-info{flex:1;min-width:0;}
   .product-line{display:flex;align-items:baseline;gap:8px;}
-  .product-name{font-weight:700;font-size:16px;white-space:nowrap;}
+  .product-name{font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;min-width:0;flex-shrink:1;}
   .leader{flex:1;border-bottom:2px dotted var(--line);height:0;margin-bottom:5px;}
   .product-price{font-weight:700;color:var(--wine);font-size:15px;white-space:nowrap;}
   .desc-arrow{display:inline-block;margin-right:4px;color:var(--ink-soft);font-size:11px;transition:transform .25s ease;flex-shrink:0;}
@@ -1012,7 +1012,28 @@ HTML_PAGE = r"""<!DOCTYPE html>
 
       main.appendChild(section);
     });
+
+    fitLongProductNames();
   }
+
+  // اگر اسم محصول طولانی بود، فونتش رو خودکار کوچیک می‌کنیم تا از قاب بیرون نزنه
+  function fitLongProductNames(){
+    const MAX_FONT = 16, MIN_FONT = 10, STEP = 0.5;
+    document.querySelectorAll('.product-name').forEach(el=>{
+      el.style.fontSize = MAX_FONT + 'px';
+      let fontSize = MAX_FONT;
+      while(fontSize > MIN_FONT && el.scrollWidth > el.clientWidth){
+        fontSize -= STEP;
+        el.style.fontSize = fontSize + 'px';
+      }
+    });
+  }
+
+  let fitNamesResizeTimer = null;
+  window.addEventListener('resize', ()=>{
+    clearTimeout(fitNamesResizeTimer);
+    fitNamesResizeTimer = setTimeout(fitLongProductNames, 150);
+  });
 
   function escapeHtml(str){
     const d = document.createElement('div');
